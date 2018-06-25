@@ -15,5 +15,8 @@
   "bugs": {
     "url": "https://github.com/pbs/vanna-js-client/issues"
   },
-  "homepage": "https://github.com/pbs/vanna-js-client#readme"
+  "homepage": "https://github.com/pbs/vanna-js-client#readme",
+  "dependencies": {
+    "babel-cli": "^6.26.0"
+  }
 }

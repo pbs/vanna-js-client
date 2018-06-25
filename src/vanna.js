@@ -1,3 +1,9 @@
-const foo = 22;
+class VannaClient {
+  client = {};
 
-export default foo;
+  setup() {
+    return client;
+  }
+}
+
+export default VannaClient();

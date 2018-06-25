@@ -22,6 +22,9 @@ jobs:
     steps:
       - checkout
       - run:
+          name: Sanity check 
+          command: ls -la
+      - run:
           name: Test
           command: ./node_modules/.bin/jest
 

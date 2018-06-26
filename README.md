@@ -30,6 +30,7 @@ import vanna from "@pbs/vanna";
 
 const client = vanna.setup({
   server: "https://vanna.example.com/",
+  project: "example-project-name",
   userSegment: "beta-tester"
 });
 

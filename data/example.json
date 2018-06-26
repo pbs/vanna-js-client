@@ -1,0 +1,24 @@
+{
+  "segments": {
+    "alpha-users": {
+      "slug": "alpha-users"
+    },
+    "beta-users": {
+      "slug": "beta-users"
+    }
+  },
+  "features": {
+    "some-feature": {
+      "slug": "some-feature",
+      "type": "boolean",
+      "value": true,
+      "targetSegment": ["alpha-users"]
+    },
+    "another-feature": {
+      "slug": "another-feature",
+      "type": "boolean",
+      "value": true,
+      "targetSegment": ["beta-users"]
+    }
+  }
+}

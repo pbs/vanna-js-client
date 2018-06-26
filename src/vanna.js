@@ -1,9 +1,7 @@
 class VannaClient {
-  client = {};
-
   setup() {
-    return client;
+    return {};
   }
 }
 
-export default VannaClient();
+export default new VannaClient();

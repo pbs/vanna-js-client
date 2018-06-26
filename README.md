@@ -1,6 +1,6 @@
 # Vanna Javascript (Browser) Client
 
-# Introduction
+## Introduction
 
 Vanna is an internal feature flagging service used at [PBS](http://pbs.org). It
 helps deliver new features to users quickly and safely. This is an example

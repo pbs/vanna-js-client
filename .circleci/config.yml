@@ -1,9 +1,9 @@
 version: 2
+
 jobs:
-  setup:
+  build:
     docker:
       - image: circleci/node:8-browsers
-    working_directory: ~/vanna
     steps:
       - checkout
       - restore_cache:
@@ -15,24 +15,15 @@ jobs:
           key: dependency-cache-{{ checksum "package.json" }}
           paths:
             - node_modules
-  test:
-    docker:
-      - image: circleci/node:8-browsers
-    working_directory: ~/vanna
-    steps:
-      - checkout
       - run:
-          name: Sanity check
-          command: ls -la
+          name: Run tests
+          command: npm test
       - run:
-          name: Test
-          command: ./node_modules/.bin/jest
+          name: Run build
+          command: npm run build
 
 workflows:
   version: 2
   main:
     jobs:
-      - setup
-      - test:
-          requires:
-            - setup
+      - build

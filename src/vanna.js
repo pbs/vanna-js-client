@@ -9,6 +9,15 @@ function getPayload(server, project) {
   return fetch(url).then(r => r.json());
 }
 
+export function isFeatureEnabled(feature, { userSegment }) {
+  const segmentMatch = feature.targetSegment.includes(userSegment);
+  if (!segmentMatch) {
+    return false;
+  }
+
+  return feature.enabled;
+}
+
 export class VannaClient {
   constructor(dependencies = {}) {
     this.options = undefined;
@@ -54,10 +63,11 @@ export class VannaClient {
       return fallback;
     }
 
+    const { userSegment } = this.options;
     const feature = this.payload.features[featureName];
     invariant(feature, `${featureName} is not a valid feature`);
-    // TODO: take userSegment into account
-    return feature.value;
+
+    return isFeatureEnabled(feature, { userSegment });
   }
 }
 

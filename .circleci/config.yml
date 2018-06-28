@@ -34,12 +34,12 @@ jobs:
           key: build-dist
       - run:
           name: NPM Authentication
-          command: | 
+          command: |
             echo "//registry.npmjs.org/:_authToken=$NPM_AUTH_TOKEN" >> ~/.npmrc
             echo "@pbs:registry=https://registry.npmjs.org/" >> ~/.npmrc
       - run:
           name: NPM Publish
-          command: npm publish --access public
+          command: .circleci/publish.sh
 
 workflows:
   version: 2

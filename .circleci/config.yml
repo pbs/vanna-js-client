@@ -35,7 +35,7 @@ jobs:
       - run:
           name: NPM Authentication
           command: | 
-            echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" >> ~/.npmrc
+            echo "//registry.npmjs.org/:_authToken=$NPM_AUTH_TOKEN" >> ~/.npmrc
             echo "@pbs:registry=https://registry.npmjs.org/" >> ~/.npmrc
       - run:
           name: NPM Publish

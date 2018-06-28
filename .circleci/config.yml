@@ -7,12 +7,12 @@ jobs:
     steps:
       - checkout
       - restore_cache:
-          key: dependency-cache-{{ checksum "package.json" }}
+          key: node-modules-{{ checksum "package.json" }}
       - run:
           name: Install Dependencies
           command: npm install
       - save_cache:
-          key: dependency-cache-{{ checksum "package.json" }}
+          key: node-modules-{{ checksum "package.json" }}
           paths:
             - node_modules
       - run:
@@ -21,9 +21,31 @@ jobs:
       - run:
           name: Run build
           command: npm run build
+      - save_cache:
+          key: build-dist 
+          paths:
+            - dist
+  publish:
+    docker:
+      - image: circleci/node:8-browsers
+    steps:
+      - checkout
+      - restore_cache:
+          key: build-dist
+      - run:
+          name: NPM Authentication
+          command: |
+            echo "//registry.npmjs.org/:_authToken=$NPM_AUTH_TOKEN" >> ~/.npmrc
+            echo "@pbs:registry=https://registry.npmjs.org/" >> ~/.npmrc
+      - run:
+          name: NPM Publish
+          command: .circleci/publish.sh
 
 workflows:
   version: 2
   main:
     jobs:
       - build
+      - publish:
+          requires:
+            - build

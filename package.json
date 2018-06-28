@@ -18,9 +18,11 @@
   },
   "homepage": "https://github.com/pbs/vanna-js-client#readme",
   "dependencies": {
+    "invariant": "^2.2.4"
+  },
+  "devDependencies": {
     "babel-cli": "^6.26.0",
     "babel-preset-env": "^1.7.0",
-    "invariant": "^2.2.4",
     "jest": "^23.2.0"
   }
 }

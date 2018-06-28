@@ -1,6 +1,6 @@
 {
   "name": "@pbs/vanna",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Feature flagging service client",
   "main": "src/index.js",
   "scripts": {

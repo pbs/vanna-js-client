@@ -11,13 +11,19 @@
     "some-feature": {
       "slug": "some-feature",
       "type": "boolean",
-      "value": true,
+      "enabled": true,
       "targetSegment": ["alpha-users"]
     },
     "another-feature": {
       "slug": "another-feature",
       "type": "boolean",
-      "value": true,
+      "enabled": true,
+      "targetSegment": ["beta-users"]
+    },
+    "disabled-feature": {
+      "slug": "another-feature",
+      "type": "boolean",
+      "enabled": false,
       "targetSegment": ["beta-users"]
     }
   }

@@ -1,6 +1,6 @@
 {
   "name": "@pbs/vanna",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Feature flagging service client",
   "main": "dist/vanna.js",
   "scripts": {

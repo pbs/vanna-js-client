@@ -22,7 +22,7 @@ jobs:
           name: Run build
           command: npm run build
       - store_artifacts:
-          path: /example/build
+          path: example/build
           destination: example
       - save_cache:
           key: build-dist 

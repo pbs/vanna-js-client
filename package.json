@@ -4,7 +4,10 @@
   "description": "Feature flagging service client",
   "main": "dist/vanna.js",
   "scripts": {
-    "build": "babel src --out-dir dist",
+    "build:package": "babel src --out-dir dist",
+    "build:example": "parcel build example/index.html --out-dir example/build",
+    "build": "npm run build:package && npm run build:example",
+    "start": "parcel example/index.html --out-dir example/build",
     "test": "jest"
   },
   "repository": {
@@ -23,6 +26,7 @@
   "devDependencies": {
     "babel-cli": "^6.26.0",
     "babel-preset-env": "^1.7.0",
-    "jest": "^23.2.0"
+    "jest": "^23.2.0",
+    "parcel-bundler": "^1.9.4"
   }
 }

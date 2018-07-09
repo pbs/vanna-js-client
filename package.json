@@ -4,7 +4,10 @@
   "description": "Feature flagging service client",
   "main": "dist/vanna.js",
   "scripts": {
-    "build": "babel src --out-dir dist",
+    "build:package": "babel src --out-dir dist",
+    "build:example": "parcel build example/index.html --out-dir example/build",
+    "build": "npm run build:package && npm run build:example",
+    "start": "parcel example/index.html --out-dir example/build",
     "test": "jest"
   },
   "repository": {

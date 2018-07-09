@@ -1,15 +1,16 @@
 import invariant from "invariant";
 
-function getPayloadUrl(server, project) {
-  return `${server}/${project}.json`;
+export function validateOptions(options) {
+  const { uri } = options;
+  invariant(uri, "uri is a required setup parameter");
+  return options;
 }
 
-function getPayload(server, project) {
-  const url = getPayloadUrl(server, project);
-  return fetch(url).then(r => r.json());
+export function getManifest(uri) {
+  return fetch(uri).then(r => r.json());
 }
 
-export function isFeatureEnabled(feature, { userSegment }) {
+export function getFeatureVariation(feature, { userSegment }) {
   const segmentMatch = feature.targetSegment.includes(userSegment);
   if (!segmentMatch) {
     return false;
@@ -19,56 +20,51 @@ export function isFeatureEnabled(feature, { userSegment }) {
 }
 
 export class VannaClient {
-  constructor(dependencies = {}) {
-    this.options = undefined;
-    this.payload = undefined;
+  constructor(options = {}) {
+    this.options = validateOptions(options);
+    this.manifest = undefined;
 
-    this.setup = this.setup.bind(this);
     this.on = this.on.bind(this);
     this.variation = this.variation.bind(this);
-
-    this.getPayload = dependencies.getPayload || getPayload;
-  }
-
-  setup(options = {}) {
-    const { server, project, userSegment } = options;
-    invariant(server, "server is a required setup parameter");
-    invariant(project, "project is a required setup parameter");
-
-    this.options = { server, project, userSegment };
     return { on: this.on, variation: this.variation };
   }
 
   on(eventName, cb) {
-    invariant(
-      this.options,
-      "setup must be called before events can be attached"
-    );
     invariant(eventName === "ready", `${eventName} is not a valid event`);
+    this.onReady(cb);
+  }
 
-    const { server, project } = this.options;
-    this.getPayload(server, project)
-      .then(payload => {
-        this.payload = payload;
+  onReady(cb) {
+    const { uri, _overrides } = this.options;
+    getManifest = _overrides.getManifest || getManifest;
+    getManifest(uri)
+      .then(manifest => {
+        this.manifest = manifest;
       })
       .then(cb)
       .catch(() => {
-        this.payload = null;
+        // Fetching or parsing the manifest can fail in certain cases.
+        // In these cases, we'll have to make sure to serve fallback
+        // values for each variant calls.
+        this.manifest = null;
         cb();
       });
   }
 
   variation(featureName, { fallback }) {
-    if (!this.payload) {
+    if (!this.manifest) {
       return fallback;
     }
 
     const { userSegment } = this.options;
-    const feature = this.payload.features[featureName];
+    const feature = this.manifest.features[featureName];
     invariant(feature, `${featureName} is not a valid feature`);
 
-    return isFeatureEnabled(feature, { userSegment });
+    const { _overrides } = this.options;
+    const getFeatureVariation =
+      _overrides.getFeatureVariation || getFeatureVariation;
+    return getFeatureVariation(feature, { userSegment });
   }
 }
 
-export default new VannaClient();
+export default VannaClient;

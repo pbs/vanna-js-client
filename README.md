@@ -26,11 +26,10 @@ After installing `vanna`, you can import it with your Javascript bundler of
 choice and setup the client.
 
 ```js
-import vanna from "@pbs/vanna";
+import { VannaClient } from "@pbs/vanna";
 
-const client = vanna.setup({
-  server: "https://vanna.example.com/",
-  project: "example-project-name",
+const client = VannaClient({
+  uri: "https://vanna.example.com/project",
   userSegment: "beta-tester"
 });
 

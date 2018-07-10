@@ -24,8 +24,8 @@ jobs:
       - store_artifacts:
           path: example/build
           destination: example
-      - save_cache:
-          key: build-dist 
+      - persist_to_workspace:
+          root: .
           paths:
             - dist
   publish:
@@ -33,8 +33,8 @@ jobs:
       - image: circleci/node:8-browsers
     steps:
       - checkout
-      - restore_cache:
-          key: build-dist
+      - attach_workspace:
+          at: .
       - run:
           name: NPM Authentication
           command: |

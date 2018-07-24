@@ -21,7 +21,9 @@
   },
   "homepage": "https://github.com/pbs/vanna-js-client#readme",
   "dependencies": {
-    "invariant": "^2.2.4"
+    "invariant": "^2.2.4",
+    "lodash.defaults": "^4.2.0",
+    "lodash.isboolean": "^3.0.3"
   },
   "devDependencies": {
     "babel-cli": "^6.26.0",

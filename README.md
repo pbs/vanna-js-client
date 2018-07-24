@@ -30,7 +30,10 @@ import { VannaClient } from "@pbs/vanna";
 
 const client = VannaClient({
   uri: "https://vanna.example.com/project",
-  userSegment: "beta-tester"
+  userSegment: "beta-tester",
+  fallbacks: {
+    "your-feature-slug": false
+  }
 });
 
 client.on("ready", () => {

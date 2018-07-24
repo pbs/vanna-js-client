@@ -1,9 +1,11 @@
+import defaults from "lodash.defaults";
 import invariant from "invariant";
+import isBoolean from "lodash.isboolean";
 
 export function validateOptions(options) {
   const { uri } = options;
   invariant(uri, "uri is a required setup parameter");
-  return options;
+  return defaults(options, { fallbacks: {} });
 }
 
 export function getManifest(uri) {
@@ -36,8 +38,7 @@ export class VannaClient {
 
   onReady(cb) {
     const { uri, _overrides } = this.options;
-    getManifest = _overrides.getManifest || getManifest;
-    getManifest(uri)
+    (_overrides.getManifest || getManifest)(uri)
       .then(manifest => {
         this.manifest = manifest;
       })
@@ -51,19 +52,28 @@ export class VannaClient {
       });
   }
 
-  variation(featureName, { fallback }) {
+  variation(featureName, variationOptions = {}) {
+    const { fallbacks, userSegment } = this.options;
+    const globalFallback = fallbacks[featureName];
+    const variationFallback = variationOptions.fallback;
+    invariant(
+      isBoolean(globalFallback) || isBoolean(variationFallback),
+      "feature fallback must be set globally or per variation call"
+    );
     if (!this.manifest) {
-      return fallback;
+      if (isBoolean(globalFallback)) {
+        return globalFallback;
+      }
+      return variationFallback;
     }
 
-    const { userSegment } = this.options;
     const feature = this.manifest.features[featureName];
     invariant(feature, `${featureName} is not a valid feature`);
 
     const { _overrides } = this.options;
-    const getFeatureVariation =
-      _overrides.getFeatureVariation || getFeatureVariation;
-    return getFeatureVariation(feature, { userSegment });
+    return (_overrides.getFeatureVariation || getFeatureVariation)(feature, {
+      userSegment
+    });
   }
 }
 

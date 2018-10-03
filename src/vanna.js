@@ -27,6 +27,7 @@ export class VannaClient {
     this.manifest = undefined;
 
     this.on = this.on.bind(this);
+    this.onReady = this.onReady.bind(this);
     this.variation = this.variation.bind(this);
     return { on: this.on, variation: this.variation };
   }

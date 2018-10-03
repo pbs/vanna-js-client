@@ -37,10 +37,7 @@ const client = VannaClient({
 });
 
 client.on("ready", () => {
-  const isFeatureEnabled = client.variation("your-feature-slug", {
-    fallback: false
-  });
-
+  const isFeatureEnabled = client.variation("your-feature-slug");
   if (isFeatureEnabled) {
     // Do something if feature is enabled
   } else {

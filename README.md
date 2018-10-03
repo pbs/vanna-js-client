@@ -1,3 +1,10 @@
+[![Stability](https://img.shields.io/badge/Stability-Under%20Active%20Development-Red.svg)](https://github.com/pbs/vanna-js-client)
+
+# Warning: Under Active Development
+
+This library is under active development and likely to change further before
+stabilizing.
+
 # Vanna Javascript (Browser) Client
 
 ## Introduction

@@ -92,12 +92,12 @@ export class VannaClient {
     return instance;
   }
 
-  on = (eventName: any, cb: any) => {
+  on = (eventName: "ready", cb: () => void) => {
     invariant(eventName === "ready", `${eventName} is not a valid event`);
     this.onReady(cb);
   };
 
-  onReady = (cb: any) => {
+  onReady = (cb: () => void) => {
     const { uri, _overrides } = this.options;
     const manifestLoader: ManifestLoader =
       _overrides.getManifest || getManifest;

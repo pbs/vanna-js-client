@@ -43,8 +43,10 @@ interface VannaManifest {
   features: VannaManifestFeatures;
 }
 
+type ManifestLoader = (uri: string) => Promise<VannaManifest>;
+
 interface VannaSetupOverrides {
-  getManifest?: (uri: string) => Promise<VannaManifest>;
+  getManifest?: ManifestLoader;
   getFeatureVariation?: any;
 }
 
@@ -97,7 +99,10 @@ export class VannaClient {
 
   onReady = (cb: any) => {
     const { uri, _overrides } = this.options;
-    (_overrides.getManifest || getManifest)(uri)
+    const manifestLoader: ManifestLoader =
+      _overrides.getManifest || getManifest;
+
+    manifestLoader(uri)
       .then(manifest => {
         this.state = "HAS_MANIFEST";
         this.manifest = manifest;

@@ -47,19 +47,16 @@ export class VannaClient {
     this.options = validateOptions(options);
     this.manifest = undefined;
 
-    this.on = this.on.bind(this);
-    this.onReady = this.onReady.bind(this);
-    this.variation = this.variation.bind(this);
     const instance: any = { on: this.on, variation: this.variation };
     return instance;
   }
 
-  on(eventName: any, cb: any) {
+  on = (eventName: any, cb: any) => {
     invariant(eventName === "ready", `${eventName} is not a valid event`);
     this.onReady(cb);
-  }
+  };
 
-  onReady(cb: any) {
+  onReady = (cb: any) => {
     const { uri, _overrides } = this.options;
     (_overrides.getManifest || getManifest)(uri)
       .then((manifest: any) => {
@@ -75,9 +72,9 @@ export class VannaClient {
         this.manifest = null;
         cb();
       });
-  }
+  };
 
-  variation(featureName: any, variationOptions: any = {}) {
+  variation = (featureName: any, variationOptions: any = {}) => {
     const { fallbacks, userSegment } = this.options;
     const globalFallback = fallbacks[featureName];
     const variationFallback = variationOptions.fallback;
@@ -99,7 +96,7 @@ export class VannaClient {
     return (_overrides.getFeatureVariation || getFeatureVariation)(feature, {
       userSegment
     });
-  }
+  };
 }
 
 export default VannaClient;

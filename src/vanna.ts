@@ -114,9 +114,6 @@ export class VannaClient {
       })
       .then(cb)
       .catch(() => {
-        // Fetching or parsing the manifest can fail in certain cases.
-        // In these cases, we'll have to make sure to serve fallback
-        // values for each variant calls.
         this.state = "NO_MANIFEST";
         cb();
       });

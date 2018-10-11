@@ -26,7 +26,10 @@
     "lodash.isboolean": "^3.0.3"
   },
   "devDependencies": {
+    "@types/invariant": "^2.2.29",
     "@types/jest": "^23.3.5",
+    "@types/lodash.defaults": "^4.2.4",
+    "@types/lodash.isboolean": "^3.0.4",
     "jest": "^23.2.0",
     "parcel-bundler": "^1.9.4",
     "ts-jest": "^23.10.4",

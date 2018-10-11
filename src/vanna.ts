@@ -30,32 +30,28 @@ interface VannaFeature {
   targetSegment: string[];
 }
 
-interface VannaManifestSegments {
-  [projectSlug: string]: VannaSegment;
-}
-
-interface VannaManifestFeatures {
-  [featureSlug: string]: VannaFeature;
-}
-
 interface VannaManifest {
   name: string;
-  segments: VannaManifestSegments;
-  features: VannaManifestFeatures;
+  segments: {
+    [projectSlug: string]: VannaSegment;
+  };
+  features: {
+    [featureSlug: string]: VannaFeature;
+  };
 }
 
 type ManifestLoader = (uri: string) => Promise<VannaManifest>;
 
-interface VannaSetupOverrides {
-  getManifest?: ManifestLoader;
-  getFeatureVariation?: any;
-}
-
 interface VannaSetupOptions {
   uri: string;
-  fallbacks: any;
   userSegment: string;
-  _overrides: VannaSetupOverrides;
+  fallbacks: {
+    [featureSlug: string]: boolean;
+  };
+  _overrides: {
+    getManifest?: ManifestLoader;
+    getFeatureVariation?: any;
+  };
 }
 
 interface VannaVariationOptions {

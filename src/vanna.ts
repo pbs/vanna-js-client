@@ -9,15 +9,15 @@ function invariant(condition: any, message: string): void {
 }
 
 // Vanna's internal state is very simple. It starts out at
-// READY and can transition to either HAS_MANIFEST or NO_MANIFEST.
-// READY represents the state where the client has been
+// INITIALIZED and can transition to either HAS_MANIFEST or NO_MANIFEST.
+// INITIALIZED represents the state where the client has been
 // instanciated but no network call has been made to fetch
 // the project manifest that describes all the feature flags.
 // HAS_MANIFEST represents the state where the client
 // has successfully fetched the manifest.
 // NO_MANIFEST represents the state where the client has
 // failed to fetch the manifest; fallback values will be used.
-type VannaState = "READY" | "HAS_MANIFEST" | "NO_MANIFEST";
+type VannaState = "INITIALIZED" | "HAS_MANIFEST" | "NO_MANIFEST";
 
 interface VannaSegment {
   slug: string;
@@ -92,7 +92,7 @@ export class VannaClient {
   manifest?: VannaManifest;
 
   constructor(options: VannaSetupOptions) {
-    this.state = "READY";
+    this.state = "INITIALIZED";
     this.options = validateOptions(options);
     this.manifest = undefined;
   }

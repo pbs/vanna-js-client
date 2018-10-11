@@ -10,12 +10,12 @@ function invariant(condition: any, message: string): void {
 
 // Vanna's internal state is very simple. It starts out at
 // INITIALIZED and can transition to either HAS_MANIFEST or NO_MANIFEST.
-// INITIALIZED represents the state where the client has been
-// instanciated but no network call has been made to fetch
-// the project manifest that describes all the feature flags.
-// HAS_MANIFEST represents the state where the client
+// INITIALIZED represents the state when the client has been
+// instantiated but no network call has been made to fetch
+// the project manifest that describes all of the feature flags.
+// HAS_MANIFEST represents the state when the client
 // has successfully fetched the manifest.
-// NO_MANIFEST represents the state where the client has
+// NO_MANIFEST represents the state when the client has
 // failed to fetch the manifest; fallback values will be used.
 type VannaState = "INITIALIZED" | "HAS_MANIFEST" | "NO_MANIFEST";
 

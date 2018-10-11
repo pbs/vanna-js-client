@@ -1,18 +1,23 @@
-import defaults from "lodash.defaults";
-import invariant from "invariant";
-import isBoolean from "lodash.isboolean";
+const defaults = require("lodash.defaults");
+const isBoolean = require("lodash.isboolean");
 
-export function validateOptions(options) {
+function invariant(condition: any, message: string): void {
+  if (!condition) {
+    throw new Error(message);
+  }
+}
+
+export function validateOptions(options: any): any {
   const { uri } = options;
   invariant(uri, "uri is a required setup parameter");
   return defaults(options, { fallbacks: {} });
 }
 
-export function getManifest(uri) {
+export function getManifest(uri: any): any {
   return fetch(uri).then(r => r.json());
 }
 
-export function getFeatureVariation(feature, { userSegment }) {
+export function getFeatureVariation(feature: any, { userSegment }: any): any {
   const segmentMatch = feature.targetSegment.includes(userSegment);
   if (!segmentMatch) {
     return false;
@@ -22,25 +27,29 @@ export function getFeatureVariation(feature, { userSegment }) {
 }
 
 export class VannaClient {
-  constructor(options = {}) {
+  options: any;
+  manifest: any;
+
+  constructor(options: any = {}) {
     this.options = validateOptions(options);
     this.manifest = undefined;
 
     this.on = this.on.bind(this);
     this.onReady = this.onReady.bind(this);
     this.variation = this.variation.bind(this);
-    return { on: this.on, variation: this.variation };
+    const instance: any = { on: this.on, variation: this.variation };
+    return instance;
   }
 
-  on(eventName, cb) {
+  on(eventName: any, cb: any) {
     invariant(eventName === "ready", `${eventName} is not a valid event`);
     this.onReady(cb);
   }
 
-  onReady(cb) {
+  onReady(cb: any) {
     const { uri, _overrides } = this.options;
     (_overrides.getManifest || getManifest)(uri)
-      .then(manifest => {
+      .then((manifest: any) => {
         this.manifest = manifest;
       })
       .then(cb)
@@ -53,7 +62,7 @@ export class VannaClient {
       });
   }
 
-  variation(featureName, variationOptions = {}) {
+  variation(featureName: any, variationOptions: any = {}) {
     const { fallbacks, userSegment } = this.options;
     const globalFallback = fallbacks[featureName];
     const variationFallback = variationOptions.fallback;

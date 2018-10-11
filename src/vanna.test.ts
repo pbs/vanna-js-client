@@ -1,6 +1,6 @@
 import { VannaClient, getFeatureVariation } from "./vanna";
 
-import examplePayload from "../data/example.json";
+const examplePayload = require("../data/example.json");
 
 describe("vanna client interface", () => {
   const client = new VannaClient({

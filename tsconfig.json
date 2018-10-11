@@ -7,7 +7,7 @@
     "strict": true,
     "sourceMap": true,
     "declaration": true,
-    "allowSyntheticDefaultImports": true,
+    "allowSyntheticDefaultImports": false,
     "declarationDir": "dist/types",
     "outDir": "dist",
     "typeRoots": [

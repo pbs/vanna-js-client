@@ -1,6 +1,11 @@
-import defaults from "lodash.defaults";
-import invariant from "invariant";
-import isBoolean from "lodash.isboolean";
+const defaults = require("lodash.defaults");
+const isBoolean = require("lodash.isboolean");
+
+function invariant(condition: any, message: string): void {
+  if (!condition) {
+    throw new Error(message);
+  }
+}
 
 export function validateOptions(options: any): any {
   const { uri } = options;

@@ -18,13 +18,52 @@ function invariant(condition: any, message: string): void {
 // failed to fetch the manifest; fallback values will be used.
 type VannaState = "READY" | "HAS_MANIFEST" | "NO_MANIFEST";
 
-export function validateOptions(options: any): any {
+interface VannaSegment {
+  slug: string;
+}
+
+interface VannaFeature {
+  slug: string;
+  type: "boolean";
+  enabled: boolean;
+  targetSegment: string[];
+}
+
+interface VannaManifestSegments {
+  [projectSlug: string]: VannaSegment;
+}
+
+interface VannaManifestFeatures {
+  [featureSlug: string]: VannaFeature;
+}
+
+interface VannaManifest {
+  name: string;
+  segments: VannaManifestSegments;
+  features: VannaManifestFeatures;
+}
+
+interface VannaSetupOverrides {
+  getManifest?: (uri: string) => Promise<VannaManifest>;
+  getFeatureVariation?: any;
+}
+
+interface VannaSetupOptions {
+  uri: string;
+  fallbacks: any;
+  userSegment: string;
+  _overrides: VannaSetupOverrides;
+}
+
+export function validateOptions(options: VannaSetupOptions): VannaSetupOptions {
+  invariant(options, "missing vanna setup options");
+
   const { uri } = options;
   invariant(uri, "uri is a required setup parameter");
   return defaults(options, { fallbacks: {} });
 }
 
-export function getManifest(uri: any): any {
+export function getManifest(uri: string): Promise<VannaManifest> {
   return fetch(uri).then(r => r.json());
 }
 
@@ -38,11 +77,11 @@ export function getFeatureVariation(feature: any, { userSegment }: any): any {
 }
 
 export class VannaClient {
-  options: any;
-  manifest: any;
   state: VannaState;
+  options: VannaSetupOptions;
+  manifest?: VannaManifest;
 
-  constructor(options: any = {}) {
+  constructor(options: VannaSetupOptions) {
     this.state = "READY";
     this.options = validateOptions(options);
     this.manifest = undefined;
@@ -59,7 +98,7 @@ export class VannaClient {
   onReady = (cb: any) => {
     const { uri, _overrides } = this.options;
     (_overrides.getManifest || getManifest)(uri)
-      .then((manifest: any) => {
+      .then(manifest => {
         this.state = "HAS_MANIFEST";
         this.manifest = manifest;
       })
@@ -69,7 +108,6 @@ export class VannaClient {
         // In these cases, we'll have to make sure to serve fallback
         // values for each variant calls.
         this.state = "NO_MANIFEST";
-        this.manifest = null;
         cb();
       });
   };

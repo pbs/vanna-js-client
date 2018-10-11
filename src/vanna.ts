@@ -1,4 +1,5 @@
 const defaults = require("lodash.defaults");
+const includes = require("lodash.includes");
 const isBoolean = require("lodash.isboolean");
 
 function invariant(condition: any, message: string): void {
@@ -57,6 +58,10 @@ interface VannaSetupOptions {
   _overrides: VannaSetupOverrides;
 }
 
+interface VannaVariationOptions {
+  fallback?: boolean;
+}
+
 export function validateOptions(options: VannaSetupOptions): VannaSetupOptions {
   invariant(options, "missing vanna setup options");
 
@@ -69,8 +74,11 @@ export function getManifest(uri: string): Promise<VannaManifest> {
   return fetch(uri).then(r => r.json());
 }
 
-export function getFeatureVariation(feature: any, { userSegment }: any): any {
-  const segmentMatch = feature.targetSegment.includes(userSegment);
+export function getFeatureVariation(
+  feature: VannaFeature,
+  { userSegment }: any
+): boolean {
+  const segmentMatch = includes(feature.targetSegment, userSegment);
   if (!segmentMatch) {
     return false;
   }
@@ -87,9 +95,6 @@ export class VannaClient {
     this.state = "READY";
     this.options = validateOptions(options);
     this.manifest = undefined;
-
-    const instance: any = { on: this.on, variation: this.variation };
-    return instance;
   }
 
   on = (eventName: "ready", cb: () => void) => {
@@ -117,10 +122,13 @@ export class VannaClient {
       });
   };
 
-  variation = (featureName: any, variationOptions: any = {}) => {
+  variation = (
+    featureName: string,
+    variationOptions?: VannaVariationOptions
+  ) => {
     const { fallbacks, userSegment } = this.options;
     const globalFallback = fallbacks[featureName];
-    const variationFallback = variationOptions.fallback;
+    const variationFallback = variationOptions && variationOptions.fallback;
     invariant(
       isBoolean(globalFallback) || isBoolean(variationFallback),
       "feature fallback must be set globally or per variation call"

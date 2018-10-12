@@ -8,6 +8,8 @@ function invariant(condition: any, message: string): void {
   }
 }
 
+type DeepPartial<T> = { [P in keyof T]?: DeepPartial<T[P]> };
+
 // Vanna's internal state is very simple. It starts out at
 // INITIALIZED and can transition to either HAS_MANIFEST or NO_MANIFEST.
 // INITIALIZED represents the state when the client has been
@@ -25,7 +27,7 @@ interface VannaSegment {
 
 interface VannaFeature {
   slug: string;
-  type: "boolean";
+  type: string;
   enabled: boolean;
   targetSegment: string[];
 }
@@ -42,7 +44,7 @@ interface VannaManifest {
 
 type ManifestLoader = (uri: string) => Promise<VannaManifest>;
 type FeatureVariationResolver = (
-  context: Partial<VannaContext>,
+  context: DeepPartial<VannaContext>,
   feature: VannaFeature
 ) => boolean;
 
@@ -81,7 +83,7 @@ export function getManifest(uri: string): Promise<VannaManifest> {
 }
 
 export function featureVariationResolver(
-  context: Partial<VannaContext>,
+  context: DeepPartial<VannaContext>,
   feature: VannaFeature
 ): boolean {
   const userSegment = context.options && context.options.userSegment;

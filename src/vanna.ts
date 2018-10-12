@@ -82,6 +82,18 @@ export function getFeatureVariation(
   return feature.enabled;
 }
 
+export function getFeatureVariationNext(
+  vannaContext: {
+    state: VannaState;
+    options: VannaSetupOptions;
+    manifest?: VannaManifest;
+  },
+  featureName: string,
+  variationOptions?: VannaVariationOptions
+) {
+  // TODO
+}
+
 export class VannaClient {
   state: VannaState;
   options: VannaSetupOptions;
@@ -140,6 +152,20 @@ export class VannaClient {
     return (_overrides.getFeatureVariation || getFeatureVariation)(feature, {
       userSegment
     });
+  };
+
+  variationNext = (
+    featureName: string,
+    variationOptions?: VannaVariationOptions
+  ) => {
+    const state = this.state;
+    const options = this.options;
+    const manifest = this.manifest;
+    return getFeatureVariationNext(
+      { state, options, manifest },
+      featureName,
+      variationOptions
+    );
   };
 }
 

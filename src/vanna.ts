@@ -1,4 +1,5 @@
 const defaults = require("lodash.defaults");
+const includes = require("lodash.includes");
 const isBoolean = require("lodash.isboolean");
 
 function invariant(condition: any, message: string): void {
@@ -7,18 +8,86 @@ function invariant(condition: any, message: string): void {
   }
 }
 
-export function validateOptions(options: any): any {
+type DeepPartial<T> = { [P in keyof T]?: DeepPartial<T[P]> };
+
+// Vanna's internal state is very simple. It starts out at
+// INITIALIZED and can transition to either HAS_MANIFEST or NO_MANIFEST.
+// INITIALIZED represents the state when the client has been
+// instantiated but no network call has been made to fetch
+// the project manifest that describes all of the feature flags.
+// HAS_MANIFEST represents the state when the client
+// has successfully fetched the manifest.
+// NO_MANIFEST represents the state when the client has
+// failed to fetch the manifest; fallback values will be used.
+type VannaState = "INITIALIZED" | "HAS_MANIFEST" | "NO_MANIFEST";
+
+interface VannaSegment {
+  slug: string;
+}
+
+interface VannaFeature {
+  slug: string;
+  type: string;
+  enabled: boolean;
+  targetSegment: string[];
+}
+
+interface VannaManifest {
+  name: string;
+  segments: {
+    [projectSlug: string]: VannaSegment;
+  };
+  features: {
+    [featureSlug: string]: VannaFeature;
+  };
+}
+
+type ManifestLoader = (uri: string) => Promise<VannaManifest>;
+type FeatureVariationResolver = (
+  context: DeepPartial<VannaContext>,
+  feature: VannaFeature
+) => boolean;
+
+interface VannaSetupOptions {
+  uri: string;
+  userSegment: string;
+  fallbacks: {
+    [featureSlug: string]: boolean;
+  };
+  _overrides: {
+    getManifest?: ManifestLoader;
+    resolveFeature?: FeatureVariationResolver;
+  };
+}
+
+interface VannaContext {
+  state: VannaState;
+  options: VannaSetupOptions;
+  manifest?: VannaManifest;
+}
+
+interface VannaVariationOptions {
+  fallback?: boolean;
+}
+
+export function validateOptions(options: VannaSetupOptions): VannaSetupOptions {
+  invariant(options, "missing vanna setup options");
+
   const { uri } = options;
   invariant(uri, "uri is a required setup parameter");
   return defaults(options, { fallbacks: {} });
 }
 
-export function getManifest(uri: any): any {
+export function getManifest(uri: string): Promise<VannaManifest> {
   return fetch(uri).then(r => r.json());
 }
 
-export function getFeatureVariation(feature: any, { userSegment }: any): any {
-  const segmentMatch = feature.targetSegment.includes(userSegment);
+export function featureVariationResolver(
+  context: DeepPartial<VannaContext>,
+  feature: VannaFeature
+): boolean {
+  const userSegment = context.options && context.options.userSegment;
+  const segmentMatch = includes(feature.targetSegment, userSegment);
   if (!segmentMatch) {
     return false;
   }
@@ -26,65 +95,97 @@ export function getFeatureVariation(feature: any, { userSegment }: any): any {
   return feature.enabled;
 }
 
-export class VannaClient {
-  options: any;
-  manifest: any;
+export function getVariation(
+  context: VannaContext,
+  featureName: string,
+  variationOptions?: VannaVariationOptions
+) {
+  const { state, options, manifest } = context;
+  const { _overrides } = options;
 
-  constructor(options: any = {}) {
+  // Check that we're using the featureVariation after manifest has been fetched
+  invariant(
+    state !== "INITIALIZED",
+    "variation cannot be called before the ready callback"
+  );
+
+  // Check for fallbacks regardless of whether fallback is used
+  const globalFallback = options.fallbacks[featureName];
+  const variationFallback = variationOptions && variationOptions.fallback;
+  const hasFallback = isBoolean(globalFallback) || isBoolean(variationFallback);
+  invariant(
+    hasFallback,
+    "feature fallback must be set globally or per variation call"
+  );
+
+  // Return fallback if a manifest were not fetched
+  if (state === "NO_MANIFEST") {
+    if (isBoolean(globalFallback)) {
+      return globalFallback;
+    }
+    return variationFallback;
+  }
+
+  // Check that featureName is a valid feature
+  const feature = manifest && manifest.features[featureName];
+  invariant(feature, `${featureName} is not a valid feature`);
+  if (!feature) {
+    if (isBoolean(globalFallback)) {
+      return globalFallback;
+    }
+    return variationFallback;
+  }
+
+  const resolver = _overrides.resolveFeature || featureVariationResolver;
+  return resolver(context, feature);
+}
+
+export class VannaClient {
+  state: VannaState;
+  options: VannaSetupOptions;
+  manifest?: VannaManifest;
+
+  constructor(options: VannaSetupOptions) {
+    this.state = "INITIALIZED";
     this.options = validateOptions(options);
     this.manifest = undefined;
-
-    this.on = this.on.bind(this);
-    this.onReady = this.onReady.bind(this);
-    this.variation = this.variation.bind(this);
-    const instance: any = { on: this.on, variation: this.variation };
-    return instance;
   }
 
-  on(eventName: any, cb: any) {
+  on = (eventName: "ready", cb: () => void) => {
     invariant(eventName === "ready", `${eventName} is not a valid event`);
     this.onReady(cb);
-  }
+  };
 
-  onReady(cb: any) {
+  onReady = (cb: () => void) => {
     const { uri, _overrides } = this.options;
-    (_overrides.getManifest || getManifest)(uri)
-      .then((manifest: any) => {
+    const manifestLoader: ManifestLoader =
+      _overrides.getManifest || getManifest;
+
+    manifestLoader(uri)
+      .then(manifest => {
+        this.state = "HAS_MANIFEST";
         this.manifest = manifest;
       })
       .then(cb)
       .catch(() => {
-        // Fetching or parsing the manifest can fail in certain cases.
-        // In these cases, we'll have to make sure to serve fallback
-        // values for each variant calls.
-        this.manifest = null;
+        this.state = "NO_MANIFEST";
         cb();
       });
-  }
+  };
 
-  variation(featureName: any, variationOptions: any = {}) {
-    const { fallbacks, userSegment } = this.options;
-    const globalFallback = fallbacks[featureName];
-    const variationFallback = variationOptions.fallback;
-    invariant(
-      isBoolean(globalFallback) || isBoolean(variationFallback),
-      "feature fallback must be set globally or per variation call"
+  variation = (
+    featureName: string,
+    variationOptions?: VannaVariationOptions
+  ) => {
+    const state = this.state;
+    const options = this.options;
+    const manifest = this.manifest;
+    return getVariation(
+      { state, options, manifest },
+      featureName,
+      variationOptions
     );
-    if (!this.manifest) {
-      if (isBoolean(globalFallback)) {
-        return globalFallback;
-      }
-      return variationFallback;
-    }
-
-    const feature = this.manifest.features[featureName];
-    invariant(feature, `${featureName} is not a valid feature`);
-
-    const { _overrides } = this.options;
-    return (_overrides.getFeatureVariation || getFeatureVariation)(feature, {
-      userSegment
-    });
-  }
+  };
 }
 
 export default VannaClient;

@@ -22,12 +22,14 @@
   "homepage": "https://github.com/pbs/vanna-js-client#readme",
   "dependencies": {
     "lodash.defaults": "^4.2.0",
+    "lodash.includes": "^4.3.0",
     "lodash.isboolean": "^3.0.3"
   },
   "devDependencies": {
     "@types/invariant": "^2.2.29",
     "@types/jest": "^23.3.5",
     "@types/lodash.defaults": "^4.2.4",
+    "@types/lodash.includes": "^4.3.4",
     "@types/lodash.isboolean": "^3.0.4",
     "@types/node": "^10.11.7",
     "jest": "^23.2.0",

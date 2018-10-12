@@ -1,11 +1,15 @@
-import { VannaClient, getFeatureVariation } from "./vanna";
+import { VannaClient, featureVariationResolver } from "./vanna";
 
 const examplePayload = require("../data/example.json");
 
 describe("vanna client interface", () => {
   const client = new VannaClient({
     uri: "https://vanna.example.com/project",
-    _overrides: { getManifest: () => Promise.resolve(examplePayload) }
+    userSegment: "admin",
+    fallbacks: {},
+    _overrides: {
+      getManifest: __ => Promise.resolve(examplePayload)
+    }
   });
 
   it("should have valid example payload", () => {
@@ -28,32 +32,36 @@ describe("vanna client interface", () => {
   });
 });
 
-describe("vanna helpers", () => {
-  describe("getFeatureVariation helper", () => {
-    it("should handle user segment matching", () => {
-      const feature = {
-        type: "boolean",
-        enabled: true,
-        targetSegment: ["some-segment"]
-      };
-      const userSegment = "some-segment";
+describe("getFeatureVariation helper", () => {
+  it("should handle user segment matching", () => {
+    const userSegment = "some-segment";
+    const context = {
+      options: { userSegment }
+    };
 
-      const actual = getFeatureVariation(feature, { userSegment });
-      const expected = true;
-      expect(actual).toEqual(expected);
-    });
+    const feature = {
+      slug: "some-feature",
+      type: "boolean",
+      enabled: true,
+      targetSegment: ["some-segment"]
+    };
 
-    it("should handle user segment not matching", () => {
-      const feature = {
-        type: "boolean",
-        enabled: true,
-        targetSegment: ["some-segment"]
-      };
-      const userSegment = "another-segment";
+    const actual = featureVariationResolver(context, feature);
+    expect(actual).toEqual(true);
+  });
 
-      const actual = getFeatureVariation(feature, { userSegment });
-      const expected = false;
-      expect(actual).toEqual(expected);
-    });
+  it("should handle user segment not matching", () => {
+    const userSegment = "another-segment";
+    const context = { options: { userSegment } };
+
+    const feature = {
+      slug: "some-feature",
+      type: "boolean",
+      enabled: true,
+      targetSegment: ["some-segment"]
+    };
+
+    const actual = featureVariationResolver(context, feature);
+    expect(actual).toEqual(false);
   });
 });

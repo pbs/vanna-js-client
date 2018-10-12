@@ -55,7 +55,7 @@ interface VannaSetupOptions {
   fallbacks: {
     [featureSlug: string]: boolean;
   };
-  _overrides: {
+  _overrides?: {
     getManifest?: ManifestLoader;
     resolveFeature?: FeatureVariationResolver;
   };
@@ -149,8 +149,8 @@ export function getVariation(
     }
     return variationFallback;
   }
-
-  const resolver = _overrides.resolveFeature || featureVariationResolver;
+  const resolver =
+    (_overrides && _overrides.resolveFeature) || featureVariationResolver;
   return resolver(context, feature);
 }
 
@@ -173,7 +173,7 @@ export class VannaClient {
   onReady = (cb: () => void) => {
     const { uri, timeout, _overrides } = this.options;
     const manifestLoader: ManifestLoader =
-      _overrides.getManifest || getManifest;
+      (_overrides && _overrides.getManifest) || getManifest;
 
     manifestLoader(uri, timeout)
       .then(manifest => {

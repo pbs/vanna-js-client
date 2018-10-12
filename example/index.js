@@ -1,15 +1,10 @@
-import { VannaClient } from "../src/vanna";
-
-import exampleManifest from "../data/example.json";
+import VannaClient from "../dist/vanna";
 
 const client = new VannaClient({
-  uri: "https://vanna.example.com/project-manifest",
+  uri: "http://localhost:2345/data/example.json",
   userSegment: "alpha-users",
   fallbacks: {
     "some-feature": false
-  },
-  _overrides: {
-    getManifest: () => Promise.resolve(exampleManifest)
   }
 });
 

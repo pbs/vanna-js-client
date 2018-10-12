@@ -47,8 +47,7 @@ describe("getFeatureVariation helper", () => {
     };
 
     const actual = featureVariationResolver(context, feature);
-    const expected = true;
-    expect(actual).toEqual(expected);
+    expect(actual).toEqual(true);
   });
 
   it("should handle user segment not matching", () => {
@@ -63,7 +62,6 @@ describe("getFeatureVariation helper", () => {
     };
 
     const actual = featureVariationResolver(context, feature);
-    const expected = false;
-    expect(actual).toEqual(expected);
+    expect(actual).toEqual(false);
   });
 });

@@ -41,6 +41,10 @@ interface VannaManifest {
 }
 
 type ManifestLoader = (uri: string) => Promise<VannaManifest>;
+type FeatureVariationResolver = (
+  context: Partial<VannaContext>,
+  feature: VannaFeature
+) => boolean;
 
 interface VannaSetupOptions {
   uri: string;
@@ -50,8 +54,14 @@ interface VannaSetupOptions {
   };
   _overrides: {
     getManifest?: ManifestLoader;
-    getFeatureVariation?: any;
+    resolveFeature?: FeatureVariationResolver;
   };
+}
+
+interface VannaContext {
+  state: VannaState;
+  options: VannaSetupOptions;
+  manifest?: VannaManifest;
 }
 
 interface VannaVariationOptions {
@@ -70,10 +80,11 @@ export function getManifest(uri: string): Promise<VannaManifest> {
   return fetch(uri).then(r => r.json());
 }
 
-export function getFeatureVariation(
-  feature: VannaFeature,
-  { userSegment }: any
+export function featureVariationResolver(
+  context: Partial<VannaContext>,
+  feature: VannaFeature
 ): boolean {
+  const userSegment = context.options && context.options.userSegment;
   const segmentMatch = includes(feature.targetSegment, userSegment);
   if (!segmentMatch) {
     return false;
@@ -82,16 +93,49 @@ export function getFeatureVariation(
   return feature.enabled;
 }
 
-export function getFeatureVariationNext(
-  vannaContext: {
-    state: VannaState;
-    options: VannaSetupOptions;
-    manifest?: VannaManifest;
-  },
+export function getVariation(
+  context: VannaContext,
   featureName: string,
   variationOptions?: VannaVariationOptions
 ) {
-  // TODO
+  const { state, options, manifest } = context;
+  const { _overrides } = options;
+
+  // Check that we're using the featureVariation after manifest has been fetched
+  invariant(
+    state !== "INITIALIZED",
+    "variation cannot be called before the ready callback"
+  );
+
+  // Check for fallbacks regardless of whether fallback is used
+  const globalFallback = options.fallbacks[featureName];
+  const variationFallback = variationOptions && variationOptions.fallback;
+  const hasFallback = isBoolean(globalFallback) || isBoolean(variationFallback);
+  invariant(
+    hasFallback,
+    "feature fallback must be set globally or per variation call"
+  );
+
+  // Return fallback if a manifest were not fetched
+  if (state === "NO_MANIFEST") {
+    if (isBoolean(globalFallback)) {
+      return globalFallback;
+    }
+    return variationFallback;
+  }
+
+  // Check that featureName is a valid feature
+  const feature = manifest && manifest.features[featureName];
+  invariant(feature, `${featureName} is not a valid feature`);
+  if (!feature) {
+    if (isBoolean(globalFallback)) {
+      return globalFallback;
+    }
+    return variationFallback;
+  }
+
+  const resolver = _overrides.resolveFeature || featureVariationResolver;
+  return resolver(context, feature);
 }
 
 export class VannaClient {
@@ -131,37 +175,10 @@ export class VannaClient {
     featureName: string,
     variationOptions?: VannaVariationOptions
   ) => {
-    const { fallbacks, userSegment } = this.options;
-    const globalFallback = fallbacks[featureName];
-    const variationFallback = variationOptions && variationOptions.fallback;
-    invariant(
-      isBoolean(globalFallback) || isBoolean(variationFallback),
-      "feature fallback must be set globally or per variation call"
-    );
-    if (!this.manifest) {
-      if (isBoolean(globalFallback)) {
-        return globalFallback;
-      }
-      return variationFallback;
-    }
-
-    const feature = this.manifest.features[featureName];
-    invariant(feature, `${featureName} is not a valid feature`);
-
-    const { _overrides } = this.options;
-    return (_overrides.getFeatureVariation || getFeatureVariation)(feature, {
-      userSegment
-    });
-  };
-
-  variationNext = (
-    featureName: string,
-    variationOptions?: VannaVariationOptions
-  ) => {
     const state = this.state;
     const options = this.options;
     const manifest = this.manifest;
-    return getFeatureVariationNext(
+    return getVariation(
       { state, options, manifest },
       featureName,
       variationOptions

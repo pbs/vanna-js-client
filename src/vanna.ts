@@ -42,7 +42,7 @@ interface VannaManifest {
   };
 }
 
-type ManifestLoader = (uri: string) => Promise<VannaManifest>;
+type ManifestLoader = (uri: string, timeout?: number) => Promise<VannaManifest>;
 type FeatureVariationResolver = (
   context: DeepPartial<VannaContext>,
   feature: VannaFeature
@@ -51,6 +51,7 @@ type FeatureVariationResolver = (
 interface VannaSetupOptions {
   uri: string;
   userSegment: string;
+  timeout?: number;
   fallbacks: {
     [featureSlug: string]: boolean;
   };
@@ -78,8 +79,21 @@ export function validateOptions(options: VannaSetupOptions): VannaSetupOptions {
   return defaults(options, { fallbacks: {} });
 }
 
-export function getManifest(uri: string): Promise<VannaManifest> {
-  return fetch(uri).then(r => r.json());
+export function getManifest(
+  uri: string,
+  timeout?: number
+): Promise<VannaManifest> {
+  const timeoutSentinel = "TIMEOUT";
+  const timeoutPromise = new Promise(resolve => {
+    setTimeout(resolve, timeout || 1000);
+  });
+  const fetchedPromise = fetch(uri).then(r => r.json());
+  return Promise.race([timeoutPromise, fetchedPromise]).then(data => {
+    if (data === timeoutSentinel) {
+      throw new Error("Manifest fetching timed out");
+    }
+    return data;
+  });
 }
 
 export function featureVariationResolver(
@@ -157,11 +171,11 @@ export class VannaClient {
   };
 
   onReady = (cb: () => void) => {
-    const { uri, _overrides } = this.options;
+    const { uri, timeout, _overrides } = this.options;
     const manifestLoader: ManifestLoader =
       _overrides.getManifest || getManifest;
 
-    manifestLoader(uri)
+    manifestLoader(uri, timeout)
       .then(manifest => {
         this.state = "HAS_MANIFEST";
         this.manifest = manifest;

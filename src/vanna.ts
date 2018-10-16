@@ -25,12 +25,21 @@ interface VannaSegment {
   slug: string;
 }
 
-interface VannaFeature {
+interface VannaBooleanFeature {
+  type: "boolean";
   slug: string;
-  type: string;
   enabled: boolean;
   targetSegment: string[];
 }
+
+interface VannaPercentageFeature {
+  type: "percentage";
+  slug: string;
+  percentageEnabled: number;
+  targetSegment: string[];
+}
+
+type VannaFeature = VannaBooleanFeature | VannaPercentageFeature;
 
 interface VannaManifest {
   name: string;
@@ -106,7 +115,15 @@ export function featureVariationResolver(
     return false;
   }
 
-  return feature.enabled;
+  if (feature.type === "boolean") {
+    return feature.enabled;
+  }
+
+  if (feature.type === "percentage") {
+    return false;
+  }
+
+  return false;
 }
 
 export function getVariation(

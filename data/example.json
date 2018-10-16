@@ -22,9 +22,15 @@
       "targetSegment": ["beta-users"]
     },
     "disabled-feature": {
-      "slug": "another-feature",
+      "slug": "disabled-feature",
       "type": "boolean",
       "enabled": false,
+      "targetSegment": ["beta-users"]
+    },
+    "percentage-feature": {
+      "slug": "percentage-feature",
+      "type": "percentage",
+      "percentageEnabled": 42,
       "targetSegment": ["beta-users"]
     }
   }

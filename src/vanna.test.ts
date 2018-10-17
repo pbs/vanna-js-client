@@ -1,4 +1,8 @@
-import { VannaClient, featureVariationResolver } from "./vanna";
+import {
+  VannaBooleanFeature,
+  VannaClient,
+  featureVariationResolver
+} from "./vanna";
 
 const examplePayload = require("../data/example.json");
 
@@ -39,7 +43,7 @@ describe("getFeatureVariation helper", () => {
       options: { userSegment }
     };
 
-    const feature = {
+    const feature: VannaBooleanFeature = {
       slug: "some-feature",
       type: "boolean",
       enabled: true,
@@ -54,7 +58,7 @@ describe("getFeatureVariation helper", () => {
     const userSegment = "another-segment";
     const context = { options: { userSegment } };
 
-    const feature = {
+    const feature: VannaBooleanFeature = {
       slug: "some-feature",
       type: "boolean",
       enabled: true,

@@ -25,14 +25,14 @@ interface VannaSegment {
   slug: string;
 }
 
-interface VannaBooleanFeature {
+export interface VannaBooleanFeature {
   type: "boolean";
   slug: string;
   enabled: boolean;
   targetSegment: string[];
 }
 
-interface VannaPercentageFeature {
+export interface VannaPercentageFeature {
   type: "percentage";
   slug: string;
   percentageEnabled: number;

@@ -9,6 +9,7 @@ const examplePayload = require("../data/example.json");
 describe("vanna client interface", () => {
   const client = new VannaClient({
     uri: "https://vanna.example.com/project",
+    userId: "u123",
     userSegment: "admin",
     fallbacks: {},
     _overrides: {

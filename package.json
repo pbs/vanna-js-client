@@ -26,7 +26,8 @@
   "dependencies": {
     "lodash.defaults": "^4.2.0",
     "lodash.includes": "^4.3.0",
-    "lodash.isboolean": "^3.0.3"
+    "lodash.isboolean": "^3.0.3",
+    "md5": "^2.2.1"
   },
   "devDependencies": {
     "@types/invariant": "^2.2.29",

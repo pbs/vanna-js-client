@@ -1,3 +1,5 @@
+import { seededRandomPercentage } from "./random";
+
 const defaults = require("lodash.defaults");
 const includes = require("lodash.includes");
 const isBoolean = require("lodash.isboolean");
@@ -123,7 +125,8 @@ export function featureVariationResolver(
   }
 
   if (feature.type === "percentage") {
-    return false;
+    const seed = (context.options && context.options.userId) || "";
+    return seededRandomPercentage(seed) < feature.percentageEnabled;
   }
 
   return false;
@@ -169,6 +172,7 @@ export function getVariation(
     }
     return variationFallback;
   }
+
   const resolver =
     (_overrides && _overrides.resolveFeature) || featureVariationResolver;
   return resolver(context, feature);

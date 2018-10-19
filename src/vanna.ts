@@ -59,6 +59,7 @@ type FeatureVariationResolver = (
 
 interface VannaSetupOptions {
   uri: string;
+  userId: string;
   userSegment: string;
   timeout?: number;
   fallbacks: {
@@ -83,8 +84,10 @@ interface VannaVariationOptions {
 export function validateOptions(options: VannaSetupOptions): VannaSetupOptions {
   invariant(options, "missing vanna setup options");
 
-  const { uri } = options;
+  const { uri, userId, userSegment } = options;
   invariant(uri, "uri is a required setup parameter");
+  invariant(userId, "userId is a required setup parameter");
+  invariant(userSegment, "userSegment is a required setup parameter");
   return defaults(options, { fallbacks: {} });
 }
 

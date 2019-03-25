@@ -10,13 +10,7 @@ stabilizing.
 ## Introduction
 
 Vanna is a feature flagging library we use at [PBS](http://pbs.org). It
-helps us deliver new features to users quickly and safely. 
-
-To learn more about the rationale behind using feature flags, read these
-articles:
-
-- https://martinfowler.com/articles/feature-toggles.html
-- https://blog.travis-ci.com/2014-03-04-use-feature-flags-to-ship-changes-with-confidence/
+helps us deliver new features to users quickly and safely.
 
 ## Install
 
@@ -52,6 +46,14 @@ client.on("ready", () => {
   }
 });
 ```
+
+## Rationale
+
+To learn more about the rationale behind using feature flags, read these
+articles:
+
+- https://martinfowler.com/articles/feature-toggles.html
+- https://blog.travis-ci.com/2014-03-04-use-feature-flags-to-ship-changes-with-confidence/
 
 ## Licensing
 

@@ -25,7 +25,7 @@ client.
 ```js
 import { FeatureClient, Source } from "@pbs/vanna";
 
-const features = FeatureClient({
+const client = FeatureClient({
   sources: [
     Source(() => [
       {
@@ -37,7 +37,7 @@ const features = FeatureClient({
   ]
 });
 
-const isFeatureEnabled = features.variation("your-feature-slug");
+const isFeatureEnabled = client.variation("your-feature-slug");
 if (isFeatureEnabled) {
   // Do something if feature is enabled
 } else {
@@ -71,13 +71,13 @@ const inMemorySource = Source(() => [
 
 const localStorageSource = Source(() => JSON.parse(localStorage.get("featureflags")));
 
-const features = FeatureClient({
+const client = FeatureClient({
   sources: [localStorageSource, inMemorySource],
   userId: "u123456789",
   target: "beta-tester"
 });
 
-const isFeatureEnabled = features.variation("your-feature-slug");
+const isFeatureEnabled = client.variation("your-feature-slug");
 if (isFeatureEnabled) {
   // Do something if feature is enabled
 } else {
@@ -179,14 +179,19 @@ way that most of your application code will interact with `vanna`.
 
 #### `FeatureClient`
 
-The feature client can be setup with the following parameters.
+The feature client can be setup with the following parameters. Once setup, we can get whether a
+feature is enabled via `FeatureClient.variant`, which will return a boolean value.
 
 ```js
-const features = FeatureClient({
+import { FeatureClient } from "@pbs/vanna";
+
+const client = FeatureClient({
   sources: [],
   userId: "u123456789",
   target: "beta-tester"
 });
+
+const isEnabled = client.variant("some-feature");
 ```
 
 #### `sources`
@@ -207,7 +212,34 @@ against a feature's `target` to determine if a feature applies to a particular u
 
 #### `AsyncFeatureClient`
 
-TBD.
+The asynchronous version of `FeatureClient` is `AsyncFeatureClient`. It takes all the same parameter
+as `FeatureClient`, with some important differences.
+
+In particular, note that we have to call `AsyncFeatureClient.on('ready')` before we can start using
+`AsyncFeatureClient.variant`.
+
+```js
+import { AsyncFeatureClient } from "@pbs/vanna";
+
+const client = AsyncFeatureClient({
+  sources: [],
+  userId: "u123456789",
+  target: "beta-tester",
+  fallbacks: {
+    "some-feature": false
+  }
+});
+
+client.on("ready", () => {
+  const isEnabled = feature.variant("some-feature");
+});
+```
+
+#### `fallback`
+
+`AsyncFeatureClient` requires that a fallback object be passed in during setup. This ensures that if
+we fail to resolve the promise from one of its sources, we can still supply a fallback value to the
+application.
 
 ## Rationale
 

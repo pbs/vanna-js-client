@@ -23,17 +23,19 @@ After installing `vanna`, you can import it with your Javascript bundler of choi
 client.
 
 ```js
-import { FeatureClient, InMemorySource } from "@pbs/vanna";
+import { FeatureClient, Source } from "@pbs/vanna";
 
-const source = InMemorySource(() => [
-  {
-    id: "your-feature-slug",
-    type: "boolean",
-    value: true
-  }
-]);
-
-const features = FeatureClient({ sources: [source] });
+const features = FeatureClient({
+  sources: [
+    Source(() => [
+      {
+        id: "your-feature-slug",
+        type: "boolean",
+        value: true
+      }
+    ])
+  ]
+});
 
 const isFeatureEnabled = features.variation("your-feature-slug");
 if (isFeatureEnabled) {
@@ -172,13 +174,40 @@ AsyncSource(() =>
 
 ### Clients
 
+To tie the idea of features and sources together, we finally get to clients. Clients are the main
+way that most of your application code will interact with `vanna`.
+
 #### `FeatureClient`
 
-Feature client is 1.
+The feature client can be setup with the following parameters.
+
+```js
+const features = FeatureClient({
+  sources: [],
+  userId: "u123456789",
+  target: "beta-tester"
+});
+```
+
+#### `sources`
+
+Sources holds a list of sources. The list _is_ order dependent, and the client will look through the
+list one at a time until a matching feature id is found from one of the sources. Note that
+`FeatureClient` cannot accept an `AsyncSource`.
+
+#### `userId`
+
+A unique user identifier that will be required if a feature is of type `percentage`. If the user is
+an anonymous user, you have to supply a hard-coded userId or generate a unique fingerprint.
+
+#### `target`
+
+A target is a string that describes the user role or group of the user. It will be used to match
+against a feature's `target` to determine if a feature applies to a particular user.
 
 #### `AsyncFeatureClient`
 
-Feature client is 2.
+TBD.
 
 ## Rationale
 

@@ -9,9 +9,8 @@ stabilizing.
 
 ## Introduction
 
-Vanna is an internal feature flagging service used at [PBS](http://pbs.org). It
-helps deliver new features to users quickly and safely. This is an example
-client implementation for browser based Javascript.
+Vanna is a feature flagging library we use at [PBS](http://pbs.org). It
+helps us deliver new features to users quickly and safely. 
 
 To learn more about the rationale behind using feature flags, read these
 articles:

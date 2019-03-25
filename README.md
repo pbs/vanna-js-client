@@ -9,42 +9,39 @@ stabilizing.
 
 ## Introduction
 
-Vanna is a feature flagging library we use at [PBS](http://pbs.org). It
+`vanna` is a feature flagging library we use at [PBS](http://pbs.org). It
 helps us deliver new features to users quickly and safely.
 
-## Install
+## Getting Started
 
-The recommended way to install vanna is through `npm`.
+The recommended way to install `vanna` is through `npm`.
 
 ```sh
 npm install @pbs/vanna
 ```
 
-## Setup
-
 After installing `vanna`, you can import it with your Javascript bundler of
 choice and setup the client.
 
 ```js
-import { VannaClient } from "@pbs/vanna";
+import { FeatureClient, InMemorySource } from "@pbs/vanna";
 
-const client = VannaClient({
-  uri: "https://vanna.example.com/project",
-  userId: "u123",
-  userSegment: "beta-tester",
-  fallbacks: {
-    "your-feature-slug": false
+const source = InMemorySource(() => [
+  {
+    id: "your-feature-slug",
+    type: "boolean",
+    value: true
   }
-});
+]);
 
-client.on("ready", () => {
-  const isFeatureEnabled = client.variation("your-feature-slug");
-  if (isFeatureEnabled) {
-    // Do something if feature is enabled
-  } else {
-    // Do another thing if feature is disabled
-  }
-});
+const features = FeatureClient({ sources: [source] });
+
+const isFeatureEnabled = features.variation("your-feature-slug");
+if (isFeatureEnabled) {
+  // Do something if feature is enabled
+} else {
+  // Do another thing if feature is disabled
+}
 ```
 
 ## Rationale

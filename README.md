@@ -154,7 +154,7 @@ const source = Source(() => [
 
 #### `AsyncSource`
 
-AsyncSource is the async version of `Source`. It is useful for getting features from APIs that
+AsyncSource is the asynchronous version of `Source`. It is useful for getting features from APIs that
 involve asynchrony, such as fetching the list of features over the network, or from APIs like
 `IndexDB`. It will take a function that returns a promise of a list of features.
 
@@ -203,7 +203,7 @@ list one at a time until a matching feature id is found from one of the sources.
 #### `userId`
 
 A unique user identifier that will be required if a feature is of type `percentage`. If the user is
-an anonymous user, you have to supply a hard-coded userId or generate a unique fingerprint.
+an anonymous user, you have to supply a hard-coded `userId` or generate a unique fingerprint.
 
 #### `target`
 

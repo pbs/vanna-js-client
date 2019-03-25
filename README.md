@@ -52,15 +52,28 @@ if (isFeatureEnabled) {
 ```js
 import { FeatureClient, Source } from "@pbs/vanna";
 
-const source = Source(() => [
+const inMemorySource = Source(() => [
   {
     id: "your-feature-slug",
     type: "boolean",
-    value: true
+    value: true,
+    targets: ["alpha-tester"]
+  },
+  {
+    id: "another-feature-slug",
+    type: "boolean",
+    value: true,
+    targets: ["beta-tester"]
   }
 ]);
 
-const features = FeatureClient({ sources: [source] });
+const localStorageSource = Source(() => JSON.parse(localStorage.get("featureflags")));
+
+const features = FeatureClient({
+  sources: [localStorageSource, inMemorySource],
+  userId: "u123456789",
+  target: "beta-tester"
+});
 
 const isFeatureEnabled = features.variation("your-feature-slug");
 if (isFeatureEnabled) {

@@ -67,7 +67,7 @@ const inMemorySource = Source(() => [
   }
 ]);
 
-const localStorageSource = Source(() => JSON.parse(localStorage.get("featureflags")));
+const localStorageSource = Source(() => JSON.parse(localStorage.getItem("featureflags")));
 
 const client = FeatureClient({
   sources: [localStorageSource, inMemorySource],

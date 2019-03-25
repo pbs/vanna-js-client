@@ -6,8 +6,6 @@ This library is under active development and likely to change further before sta
 
 # Vanna Javascript (Browser) Client
 
-## Introduction
-
 `vanna` is a feature flagging library we use at [PBS](http://pbs.org). It helps us deliver new
 features or refactor existing ones quickly and safely.
 
@@ -87,6 +85,8 @@ if (isFeatureEnabled) {
 
 ### Features
 
+---
+
 A feature is the idea or attribute that you're considering changing in your application. It could be
 something small like `new-button-styles` or something big like `new-website-v2`. Inside `vanna` they
 are represented as an object with the following values.
@@ -124,9 +124,12 @@ _not_ match the parameter of passed into the feature client, `feature.variation`
 Target is an optional parameter of a feature that will limit the scope of the feature matching. If
 we declare a list of user types in a feature `target`, `feature.variation` will only resolve the
 `value` of the feature _if_ the `target` passed into the client matches one of the feature's
-`targets`.
+`targets`. If a target is not present in a particular feature, it's assumed that the feature targets
+all users.
 
 ### Sources
+
+---
 
 Sources is a mechanism to fetch features for clients, without sacrificing the flexibility on where
 the feature set is stored. Two main types of Sources are provided, to handle synchronous fetching as
@@ -154,8 +157,8 @@ const source = Source(() => [
 
 #### `AsyncSource`
 
-AsyncSource is the asynchronous version of `Source`. It is useful for getting features from APIs that
-involve asynchrony, such as fetching the list of features over the network, or from APIs like
+AsyncSource is the asynchronous version of `Source`. It is useful for getting features from APIs
+that involve asynchrony, such as fetching the list of features over the network, or from APIs like
 `IndexDB`. It will take a function that returns a promise of a list of features.
 
 ```js
@@ -173,6 +176,8 @@ AsyncSource(() =>
 ```
 
 ### Clients
+
+---
 
 To tie the idea of features and sources together, we finally get to clients. Clients are the main
 way that most of your application code will interact with `vanna`.

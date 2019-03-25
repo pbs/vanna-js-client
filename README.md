@@ -180,7 +180,7 @@ way that most of your application code will interact with `vanna`.
 #### `FeatureClient`
 
 The feature client can be setup with the following parameters. Once setup, we can get whether a
-feature is enabled via `FeatureClient.variant`, which will return a boolean value.
+feature is enabled via `FeatureClient.variation`, which will return a boolean value.
 
 ```js
 import { FeatureClient } from "@pbs/vanna";
@@ -191,7 +191,7 @@ const client = FeatureClient({
   target: "beta-tester"
 });
 
-const isEnabled = client.variant("some-feature");
+const isEnabled = client.variation("some-feature");
 ```
 
 #### `sources`
@@ -216,7 +216,7 @@ The asynchronous version of `FeatureClient` is `AsyncFeatureClient`. It takes al
 as `FeatureClient`, with some important differences.
 
 In particular, note that we have to call `AsyncFeatureClient.on('ready')` before we can start using
-`AsyncFeatureClient.variant`.
+`AsyncFeatureClient.variation`.
 
 ```js
 import { AsyncFeatureClient } from "@pbs/vanna";
@@ -231,7 +231,7 @@ const client = AsyncFeatureClient({
 });
 
 client.on("ready", () => {
-  const isEnabled = feature.variant("some-feature");
+  const isEnabled = feature.variation("some-feature");
 });
 ```
 

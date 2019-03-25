@@ -37,6 +37,7 @@ import { VannaClient } from "@pbs/vanna";
 
 const client = VannaClient({
   uri: "https://vanna.example.com/project",
+  userId: "u123",
   userSegment: "beta-tester",
   fallbacks: {
     "your-feature-slug": false

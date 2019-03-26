@@ -1,3 +1,3 @@
-import VannaClient from "./legacy/vanna";
+import VannaLegacyClient from "./legacy/vanna";
 
-export default VannaClient;
+export default VannaLegacyClient;

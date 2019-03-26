@@ -187,6 +187,10 @@ export class VannaClient {
     this.state = "INITIALIZED";
     this.options = validateOptions(options);
     this.manifest = undefined;
+
+    console.warn(
+      "VannaClient is deprecated. Please use FeatureClient or AsyncFeatureClient instead."
+    );
   }
 
   on = (eventName: "ready", cb: () => void) => {

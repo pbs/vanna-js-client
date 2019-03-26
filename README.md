@@ -115,7 +115,7 @@ be turned on/off depending on the users as well as a seeded random number genera
 #### `value`
 
 Value is a boolean value for your feature. This is the value that `feature.variation` will resolve
-to _if_ the users matches the parameter passed into the feature client. Conversely if the user does
+to _if_ the user matches the parameter passed into the feature client. Conversely if the user does
 _not_ match the parameter of passed into the feature client, `feature.variation` will resolve to
 `!value`.
 

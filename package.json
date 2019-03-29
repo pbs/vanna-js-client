@@ -11,7 +11,8 @@
     "start:typescript": "tsc && tsc --watch",
     "start:assets": "http-server . -p 2345 --cors",
     "start": "run-p start:*",
-    "test": "jest src"
+    "test": "jest src",
+    "format": "prettier --write ./**/*.{ts,css,html,md}"
   },
   "repository": {
     "type": "git",

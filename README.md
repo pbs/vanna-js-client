@@ -22,11 +22,11 @@ After installing `vanna`, you can import it with your Javascript bundler of
 choice and setup the client.
 
 ```js
-import { FeatureClient, Source } from "@pbs/vanna";
+import { FeatureClient, source } from "@pbs/vanna";
 
-const client = FeatureClient({
+const client = new FeatureClient({
   sources: [
-    Source(() => [
+    source(() => [
       {
         id: "your-feature-slug",
         type: "boolean",
@@ -51,9 +51,9 @@ can have a list of `Sources`, and `Sources` return a list of `Features`. As an
 example, here's an example usage of `vanna` that includes all 3 APIs.
 
 ```js
-import { FeatureClient, Source } from "@pbs/vanna";
+import { FeatureClient, source } from "@pbs/vanna";
 
-const inMemorySource = Source(() => [
+const inMemorySource = source(() => [
   {
     id: "your-feature-slug",
     type: "boolean",
@@ -68,11 +68,11 @@ const inMemorySource = Source(() => [
   }
 ]);
 
-const localStorageSource = Source(() =>
+const localStorageSource = source(() =>
   JSON.parse(localStorage.getItem("featureflags"))
 );
 
-const client = FeatureClient({
+const client = new FeatureClient({
   sources: [localStorageSource, inMemorySource],
   userId: "u123456789",
   target: "beta-tester"
@@ -152,9 +152,9 @@ it synchronously, such as in memory variables, cookies, or `localStorage`. It
 will take a function that returns a list of features.
 
 ```js
-import { Source } from "@pbs/vanna";
+import { source } from "@pbs/vanna";
 
-const source = Source(() => [
+const source = source(() => [
   {
     id: "your-feature-id",
     type: "boolean",
@@ -171,9 +171,9 @@ features over the network, or from APIs like `IndexDB`. It will take a function
 that returns a promise of a list of features.
 
 ```js
-import { AsyncSource } from "@pbs/vanna";
+import { asyncSource } from "@pbs/vanna";
 
-AsyncSource(() =>
+asyncSource(() =>
   Promise.resolve([
     {
       id: "your-feature-id",
@@ -201,7 +201,7 @@ return a boolean value.
 ```js
 import { FeatureClient } from "@pbs/vanna";
 
-const client = FeatureClient({
+const client = new FeatureClient({
   sources: [],
   userId: "u123456789",
   target: "beta-tester"
@@ -240,7 +240,7 @@ we can start using `AsyncFeatureClient.variation`.
 ```js
 import { AsyncFeatureClient } from "@pbs/vanna";
 
-const client = AsyncFeatureClient({
+const client = new AsyncFeatureClient({
   sources: [],
   userId: "u123456789",
   target: "beta-tester",

@@ -73,6 +73,22 @@ describe("synchronous api", () => {
       const isEnabled = client.variation("some-feature");
       expect(isEnabled).toEqual(false);
     });
+
+    it("should handle featureName mismatch", () => {
+      const client = new FeatureClient({
+        sources: [
+          source(() => [
+            {
+              type: "boolean",
+              slug: "some-feature",
+              enabled: true
+            }
+          ])
+        ]
+      });
+
+      expect(() => client.variation("wrong-feature")).toThrow();
+    });
   });
 
   it("should handle multiple sources", () => {
@@ -80,10 +96,6 @@ describe("synchronous api", () => {
   });
 
   it("should handle multiple sources of the same  feature", () => {
-    // todo
-  });
-
-  it("should handle featureName mismatch", () => {
     // todo
   });
 });

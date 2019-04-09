@@ -9,7 +9,7 @@ export interface VannaPercentageFeature {
   type: "percentage";
   slug: string;
   percentageEnabled: number;
-  targetSegment: string[];
+  targets?: string[];
 }
 
 export type VannaFeature = VannaBooleanFeature | VannaPercentageFeature;

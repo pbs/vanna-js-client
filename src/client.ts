@@ -20,7 +20,14 @@ export function mergeFeatures(
   return mapping;
 }
 
-export function resolveVariation(feature: VannaFeature, __: VannaOptions) {
+export function resolveVariation(feature: VannaFeature, options: VannaOptions) {
+  const invalidTarget = feature.targets && !options.target;
+  if (invalidTarget) {
+    throw new Error(
+      "Feature has targets, but no target was passed when FeatureClient was setup"
+    );
+  }
+
   if (feature.type === "boolean") {
     return feature.enabled;
   }

@@ -36,6 +36,8 @@ export function resolveVariation(feature: VannaFeature, options: VannaOptions) {
     return feature.enabled;
   }
 
+  // TODO: Implement percentage feature flag resolution
+
   return false;
 }
 

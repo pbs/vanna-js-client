@@ -29,6 +29,10 @@ export function resolveVariation(feature: VannaFeature, options: VannaOptions) {
   }
 
   if (feature.type === "boolean") {
+    if (feature.targets) {
+      return feature.targets.includes(options.target || "");
+    }
+
     return feature.enabled;
   }
 

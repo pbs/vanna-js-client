@@ -35,6 +35,44 @@ describe("synchronous api", () => {
 
       expect(() => client.variation("some-feature")).toThrow();
     });
+
+    it("should handle when a target matches", () => {
+      const client = new FeatureClient({
+        target: "alpha-user",
+        sources: [
+          source(() => [
+            {
+              type: "boolean",
+              slug: "some-feature",
+              enabled: true,
+              targets: ["alpha-user"]
+            }
+          ])
+        ]
+      });
+
+      const isEnabled = client.variation("some-feature");
+      expect(isEnabled).toEqual(true);
+    });
+
+    it("should handle when a target doesn't match", () => {
+      const client = new FeatureClient({
+        target: "alpha-user",
+        sources: [
+          source(() => [
+            {
+              type: "boolean",
+              slug: "some-feature",
+              enabled: true,
+              targets: ["beta-user"]
+            }
+          ])
+        ]
+      });
+
+      const isEnabled = client.variation("some-feature");
+      expect(isEnabled).toEqual(false);
+    });
   });
 
   it("should handle multiple sources", () => {

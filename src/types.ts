@@ -2,7 +2,7 @@ export interface VannaBooleanFeature {
   type: "boolean";
   slug: string;
   enabled: boolean;
-  targetSegment: string[];
+  targets?: string[];
 }
 
 export interface VannaPercentageFeature {

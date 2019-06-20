@@ -1,4 +1,8 @@
-import { VannaBooleanFeature, VannaClient, featureVariationResolver } from "./vanna";
+import {
+  VannaBooleanFeature,
+  VannaClient,
+  featureVariationResolver
+} from "./vanna";
 
 const examplePayload: any = {}; // TODO: fix tests
 

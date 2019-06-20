@@ -167,7 +167,8 @@ const isEnabled = client.variation("some-feature");
 
 Features will take a list of features on client initialization. There are some
 helper functions like `mergeFeatures` that will help you combine features lists
-that comes from multiples sources like `localStorage`, `cookies`, or event.
+that comes from multiples sources like `localStorage`, `cookies`, or hard coded
+values.
 
 #### `userId`
 

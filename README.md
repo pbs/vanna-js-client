@@ -10,6 +10,8 @@ stabilizing.
 `vanna` is a feature flagging library we use at [PBS](http://pbs.org). It helps
 us deliver new features or refactor existing ones quickly and safely.
 
+&nbsp;
+
 ## Getting Started
 
 The recommended way to install `vanna` is through `npm`.
@@ -41,6 +43,8 @@ if (isFeatureEnabled) {
   // Do another thing if feature is disabled
 }
 ```
+
+&nbsp;
 
 ## API
 
@@ -177,6 +181,8 @@ A target is a string that describes the user role or group of the user. It will
 be used to match against a feature's `target` to determine if a feature applies
 to a particular user.
 
+&nbsp;
+
 #### `AsyncFeatureClient`
 
 The asynchronous version of `FeatureClient` is `AsyncFeatureClient`. It takes
@@ -209,6 +215,8 @@ client.on("ready", () => {
 This ensures that if we fail to resolve the promise from one of its sources, we
 can still supply a fallback value to the application.
 
+&nbsp;
+
 ## Rationale
 
 To learn more about the rationale behind using feature flags, read these
@@ -216,6 +224,8 @@ articles:
 
 - https://martinfowler.com/articles/feature-toggles.html
 - https://blog.travis-ci.com/2014-03-04-use-feature-flags-to-ship-changes-with-confidence/
+
+&nbsp;
 
 ## Licensing
 

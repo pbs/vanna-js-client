@@ -10,6 +10,8 @@ stabilizing.
 `vanna` is a feature flagging library we use at [PBS](http://pbs.org). It helps
 us deliver new features or refactor existing ones quickly and safely.
 
+&nbsp;
+
 ## Getting Started
 
 The recommended way to install `vanna` is through `npm`.
@@ -22,17 +24,15 @@ After installing `vanna`, you can import it with your Javascript bundler of
 choice and setup the client.
 
 ```js
-import { FeatureClient, source } from "@pbs/vanna";
+import { FeatureClient } from "@pbs/vanna";
 
 const client = new FeatureClient({
-  sources: [
-    source(() => [
-      {
-        id: "your-feature-slug",
-        type: "boolean",
-        value: true
-      }
-    ])
+  features: [
+    {
+      id: "your-feature-slug",
+      type: "boolean",
+      value: true
+    }
   ]
 });
 
@@ -44,16 +44,17 @@ if (isFeatureEnabled) {
 }
 ```
 
+&nbsp;
+
 ## API
 
-`vanna`'s API surface consists: `Features`, `Sources`, and `Clients`. `Clients`
-can have a list of `Sources`, and `Sources` return a list of `Features`. As an
-example, here's an example usage of `vanna` that includes all 3 APIs.
+`vanna` has a fairly small API surface of just `Features` and `Clients`. Here's
+an example snippet of code that pulls features from code and local storage.
 
 ```js
-import { FeatureClient, source } from "@pbs/vanna";
+import { FeatureClient, mergeFeatures } from "@pbs/vanna";
 
-const inMemorySource = source(() => [
+const defaultFeatures = [
   {
     id: "your-feature-slug",
     type: "boolean",
@@ -68,14 +69,17 @@ const inMemorySource = source(() => [
   }
 ]);
 
-const localStorageSource = source(() =>
-  JSON.parse(localStorage.getItem("featureflags"))
-);
+let storedFeatures = []
+try {
+  storedFeatures = JSON.parse(localStorage.getItem("featureflags"))
+} catch (e) {
+  // Do nothing
+}
 
 const client = new FeatureClient({
-  sources: [localStorageSource, inMemorySource],
   userId: "u123456789",
-  target: "beta-tester"
+  target: "beta-tester",
+  features: mergeFeatures(defaultFeatures, storedFeatures),
 });
 
 const isFeatureEnabled = client.variation("your-feature-slug");
@@ -133,64 +137,13 @@ feature matching. If we declare a list of user types in a feature `target`,
 target is not present in a particular feature, it's assumed that the feature
 targets all users.
 
-### Sources
-
----
-
-Sources is a mechanism to fetch features for clients, without sacrificing the
-flexibility on where the feature set is stored. Two main types of Sources are
-provided, to handle synchronous fetching as well as asynchronous fetching of
-feature sets. In addition, a feature client can have multiple sources, and
-`vanna` will correctly resolve `feature.variation` based on the _order_ of the
-source configuration.
-
-#### `Source`
-
-Source is the synchronous resolver for features. It is particularly easy to get
-started with, and useful for getting features stored in places where we can get
-it synchronously, such as in memory variables, cookies, or `localStorage`. It
-will take a function that returns a list of features.
-
-```js
-import { source } from "@pbs/vanna";
-
-const source = source(() => [
-  {
-    id: "your-feature-id",
-    type: "boolean",
-    value: true
-  }
-]);
-```
-
-#### `AsyncSource`
-
-AsyncSource is the asynchronous version of `Source`. It is useful for getting
-features from APIs that involve asynchrony, such as fetching the list of
-features over the network, or from APIs like `IndexDB`. It will take a function
-that returns a promise of a list of features.
-
-```js
-import { asyncSource } from "@pbs/vanna";
-
-asyncSource(() =>
-  Promise.resolve([
-    {
-      id: "your-feature-id",
-      type: "boolean",
-      value: true
-    }
-  ])
-);
-```
-
 ### Clients
 
 ---
 
-To tie the idea of features and sources together, we finally get to clients.
 Clients are the main way that most of your application code will interact with
-`vanna`.
+`vanna`, and they are a container for the list of features that are relevant to
+your application.
 
 #### `FeatureClient`
 
@@ -202,7 +155,7 @@ return a boolean value.
 import { FeatureClient } from "@pbs/vanna";
 
 const client = new FeatureClient({
-  sources: [],
+  features: [],
   userId: "u123456789",
   target: "beta-tester"
 });
@@ -210,12 +163,12 @@ const client = new FeatureClient({
 const isEnabled = client.variation("some-feature");
 ```
 
-#### `sources`
+#### `features`
 
-Sources holds a list of sources. The list _is_ order dependent, and the client
-will look through the list one at a time until a matching feature id is found
-from one of the sources. Note that `FeatureClient` cannot accept an
-`AsyncSource`.
+Features will take a list of features on client initialization. There are some
+helper functions like `mergeFeatures` that will help you combine features lists
+that comes from multiples sources like `localStorage`, `cookies`, or hard coded
+values.
 
 #### `userId`
 
@@ -229,21 +182,24 @@ A target is a string that describes the user role or group of the user. It will
 be used to match against a feature's `target` to determine if a feature applies
 to a particular user.
 
+&nbsp;
+
 #### `AsyncFeatureClient`
 
 The asynchronous version of `FeatureClient` is `AsyncFeatureClient`. It takes
-all the same parameter as `FeatureClient`, with some important differences.
-
-In particular, note that we have to call `AsyncFeatureClient.on('ready')` before
-we can start using `AsyncFeatureClient.variation`.
+all the same parameter as `FeatureClient`, with some important differences. For
+example, instead of taking an array of `features`, `AsyncFeatureClient` requires
+that a promise that will resolve to an array of features be passed in. Also,
+please note that we have to call `AsyncFeatureClient.on('ready')` before we can
+start using `AsyncFeatureClient.variation`.
 
 ```js
 import { AsyncFeatureClient } from "@pbs/vanna";
 
 const client = new AsyncFeatureClient({
-  sources: [],
   userId: "u123456789",
   target: "beta-tester",
+  features: Promise.resolve([]),
   fallbacks: {
     "some-feature": false
   }
@@ -260,6 +216,8 @@ client.on("ready", () => {
 This ensures that if we fail to resolve the promise from one of its sources, we
 can still supply a fallback value to the application.
 
+&nbsp;
+
 ## Rationale
 
 To learn more about the rationale behind using feature flags, read these
@@ -267,6 +225,8 @@ articles:
 
 - https://martinfowler.com/articles/feature-toggles.html
 - https://blog.travis-ci.com/2014-03-04-use-feature-flags-to-ship-changes-with-confidence/
+
+&nbsp;
 
 ## Licensing
 

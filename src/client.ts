@@ -1,11 +1,16 @@
 import { VannaFeature } from "./types";
-import { VannaSource } from "./source";
 
 interface Mapping<T> {
   [key: string]: T;
 }
 
 type VannaFeatureMapping = Mapping<VannaFeature>;
+
+interface VannaClientOptions {
+  userId?: string;
+  target?: string;
+  features: VannaFeature[];
+}
 
 export function mergeFeatures(
   featuresList: VannaFeature[][]
@@ -20,7 +25,10 @@ export function mergeFeatures(
   return mapping;
 }
 
-export function resolveVariation(feature: VannaFeature, options: VannaOptions) {
+export function resolveVariation(
+  feature: VannaFeature,
+  options: VannaClientOptions
+) {
   const invalidTarget = feature.targets && !options.target;
   if (invalidTarget) {
     throw new Error(
@@ -41,23 +49,18 @@ export function resolveVariation(feature: VannaFeature, options: VannaOptions) {
   return false;
 }
 
-interface VannaOptions {
-  userId?: string;
-  target?: string;
-  sources: VannaSource[];
-}
-
 export class FeatureClient {
-  options: VannaOptions;
+  options: VannaClientOptions;
   featureMapping: VannaFeatureMapping;
 
-  constructor(options: VannaOptions) {
+  constructor(options: VannaClientOptions) {
     this.options = options;
 
-    const featuresList = options.sources
-      .filter(s => s.kind === "sync")
-      .map(s => s.fn());
-    this.featureMapping = mergeFeatures(featuresList);
+    let featureMapping: VannaFeatureMapping = {};
+    options.features.forEach(f => {
+      featureMapping[f.slug] = f;
+    });
+    this.featureMapping = featureMapping;
   }
 
   variation(featureName: string): boolean {
